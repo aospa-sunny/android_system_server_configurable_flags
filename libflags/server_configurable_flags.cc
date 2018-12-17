@@ -56,9 +56,9 @@ static bool ValidateExperimentSegment(const std::string& segment) {
 #if defined(__BIONIC__)
 static void ResetFlag(const char* key, const char* value, void* cookie) {
   if (strcmp(ATTEMPTED_BOOT_COUNT_PROPERTY, key) &&
-      android::base::StartsWith(key, SYSTEM_PROPERTY_PREFIX) && strlen(value) > 0) {
+      android::base::StartsWith(key, SYSTEM_PROPERTY_PREFIX) && strlen(value) > 0 &&
+      android::base::SetProperty(key, "")) {
     std::string* reset_flags = static_cast<std::string*>(cookie);
-    android::base::SetProperty(key, "");
     if (reset_flags->length() > 0) {
       reset_flags->append(";");
     }
@@ -99,9 +99,9 @@ void ServerConfigurableFlagsReset() {
 #endif  // __BIONIC__
 }
 
-std::string GetServerConfigurableFlags(const std::string& experiment_category_name,
-                                       const std::string& experiment_flag_name,
-                                       const std::string& default_value) {
+std::string GetServerConfigurableFlag(const std::string& experiment_category_name,
+                                      const std::string& experiment_flag_name,
+                                      const std::string& default_value) {
   if (!ValidateExperimentSegment(experiment_category_name)) {
     LOG(ERROR) << __FUNCTION__ << " invalid category name " << experiment_category_name;
     return default_value;
